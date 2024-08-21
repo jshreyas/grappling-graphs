@@ -25,8 +25,16 @@ def get_users(db):
         data = {"id": u.properties['id'], "name": u.properties['name']}
         user_objects.append(data)
 
-    return json.dumps(user_objects)
+    return user_objects
 
+def get_user(db, id):
+    command = f"MATCH (n:User) WHERE n.id={id} RETURN n;"
+    user = db.execute_and_fetch(command)
+
+    for uu in user:
+        u = uu['n']
+        data = {"id": u.properties['id'], "name": u.properties['name']}
+        return data
 
 def get_relationships(db):
     command = "MATCH (n1)-[e:FRIENDS]-(n2) RETURN n1,n2,e;"
@@ -41,7 +49,7 @@ def get_relationships(db):
                 "userTwo": n2.properties['name']}
         relationship_objects.append(data)
 
-    return json.dumps(relationship_objects)
+    return relationship_objects
 
 
 def get_graph(db):
@@ -52,21 +60,21 @@ def get_graph(db):
     node_objects = []
     added_nodes = []
     for relationship in relationships:
-        e = relationship['e']
-        data = {"source": e.nodes[0], "target": e.nodes[1]}
-        link_objects.append(data)
 
         n1 = relationship['n1']
-        if not (n1.id in added_nodes):
-            data = {"id": n1.id, "name": n1.properties['name']}
+        if not (n1.properties['id'] in added_nodes):
+            data = {"id": n1.properties['id'], "name": n1.properties['name']}
             node_objects.append(data)
-            added_nodes.append(n1.id)
+            added_nodes.append(n1.properties['id'])
 
         n2 = relationship['n2']
-        if not (n2.id in added_nodes):
-            data = {"id": n2.id, "name": n2.properties['name']}
+        if not (n2.properties['id'] in added_nodes):
+            data = {"id": n2.properties['id'], "name": n2.properties['name']}
             node_objects.append(data)
-            added_nodes.append(n2.id)
+            added_nodes.append(n2.properties['id'])
+        
+        link = {"source": n1.properties['id'], "target": n2.properties['id']}
+        link_objects.append(link)
     data = {"links": link_objects, "nodes": node_objects}
 
-    return json.dumps(data)
+    return data

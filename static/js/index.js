@@ -18,8 +18,7 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    let responseString = await response.json();
-    let responseJSON = JSON.parse(responseString);
+    let responseJSON = await response.json();
 
     var g = svg.append("g")
         .attr("class", "everything");
@@ -30,20 +29,39 @@
         .data(responseJSON.links)
         .enter().append("line");
 
+    var defaultRadius = 5;
     var node = g.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
         .data(responseJSON.nodes)
         .enter().append("circle")
-        .attr("r", 5.0)
-        .attr("fill", "darkgray")
+        .attr("r", defaultRadius)
+        .attr("fill", "orange")
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
 
+    node.on('click', function(node) {
+        console.log(node)
+        let response = fetch(`${window.origin}/get-user/` + node.id, {
+            method: "GET",
+            credentials: "include",
+            cache: "no-cache",
+            headers: new Headers({
+                "content-type": "application/json"
+            })
+        });
+    });
+
+    node.append('index')
+        .text(function(d) { return d.index; });
+
     node.append("title")
-        .text(function(d) { return d.name; });
+        .text(function(d) { return `Id: ${d.id}, Name: ${d.name}`; });
+
+    link.append("title")
+        .text(function(d) { return `Source: ${d.source}, Target: ${d.target}`; });
 
     simulation
         .nodes(responseJSON.nodes)

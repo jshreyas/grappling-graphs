@@ -10,7 +10,7 @@ app = Flask(__name__)
 def index():
     db = Memgraph()
     db_operations.clear(db)
-    db_operations.populate_database(db, "resources/data_big.txt")
+    db_operations.populate_database(db, "resources/data_small.txt")
     return render_template('index.html')
 
 @app.route('/query')
@@ -29,6 +29,13 @@ def get_users():
     db = Memgraph()
     response = make_response(
         jsonify(db_operations.get_users(db)), 200)
+    return response
+
+@app.route('/get-user/<string:user_id>', methods=["GET"])
+def get_user(user_id):
+    db = Memgraph()
+    response = make_response(
+        jsonify(db_operations.get_user(db, user_id)), 200)
     return response
 
 @app.route('/get-relationships', methods=["POST"])
