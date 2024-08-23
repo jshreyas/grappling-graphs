@@ -1,0 +1,200 @@
+// standing
+CREATE (n:Frame { 
+    id: 1, 
+    me: 'standing neutral', 
+    he: 'standing neutral',
+    situation: 'standing'
+});
+CREATE (n:Frame { 
+    id: 2, 
+    me: 'circle around shoulders, double underhooks', 
+    he: 'given up shoulder control',
+    situation: 'standing'
+});
+CREATE (n:Frame {
+    id: 3, 
+    me: 'circle around head and shoulder, front headlock', 
+    he: 'given up head and shoulder control in a snap down',
+    situation: 'standing'
+});
+CREATE (n:Frame { 
+    id: 4, 
+    me: 'circle around hips from side/back', 
+    he: 'given up hip control',
+    situation: 'standing'
+});
+
+// guarded
+CREATE (n:Frame {
+    id: 5, 
+    me: 'both hands on 1 foot', 
+    he: 'forced belly up guard',
+    situation: 'guarded'
+});
+CREATE (n:Frame { 
+    id: 6,
+    me: 'double knees', 
+    he: 'seated guard with 1 shoulder',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 7, 
+    me: 'double knees', 
+    he: 'seated guard with double underhooks',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 8, 
+    me: 'no underhooks, pinned 1 hip', 
+    he: 'bottom half guard',
+    situation: 'guarded'
+});
+CREATE (n:Frame { 
+    id: 9,
+    me: 'far underhook, pinned 1 hip', 
+    he: 'bottom half guard',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 10, 
+    me: 'circle around hips with 0 frames', 
+    he: 'hips controlled from turtle guard',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 11, 
+    me: 'circle around hips with 1 frames', 
+    he: 'hips pinned to the mat',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 12, 
+    me: 'near side hip with hook and far side shoulder', 
+    he: 'turtle guard',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 13,
+    me: 'circle around hips with 2 frames', 
+    he: 'hips pinned to the mat',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 14,
+    me: 'double knees', 
+    he: 'seated guard with head and shoulder',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 15,
+    me: 'standing in guard', 
+    he: 'seated guard with 2 on single leg',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 16,
+    me: 'double knees', 
+    he: 'seated guard with inside limbs',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 17,
+    me: 'both underhooks, pinned 1 hip',
+    he: 'bottom half guard',
+    situation: 'guarded'
+});
+CREATE (n:Frame {
+    id: 26,
+    me: 'half guard top, pinned 1 leg',
+    he: 'bottom half guard with knee shield',
+    situation: 'legs'
+});
+
+// pinning
+CREATE (n:Frame {
+    id: 18,
+    me: 's mount', 
+    he: 'bottom pin',
+    situation: 'pinning'
+});
+CREATE (n:Frame {
+    id: 19,
+    me: 'spider web', 
+    he: 'connected arms bottom pin',
+    situation: 'pinning'
+});
+CREATE (n:Frame {
+    id: 20,
+    me: 'mount: hips covered with legs',
+    he: 'mount bottom',
+    situation: 'pinning'
+});
+CREATE (n:Frame {
+    id: 21,
+    me: 'both underhooks', 
+    he: 'mount bottom',
+    situation: 'pinning'
+});
+CREATE (n:Frame {
+    id: 22,
+    me: 'back: seatbelt control of shoulders and both hooks to control hips',
+    he: 'given up back',
+    situation: 'pinning'
+});
+CREATE (n:Frame {
+    id: 25,
+    me: 'back: seatbelt control of shoulders and no hooks',
+    he: 'given up back shoulders',
+    situation: 'pinning'
+});
+
+// legs
+CREATE (n:Frame {
+    id: 23,
+    me: '2 legs controlling hips', 
+    he: 'hips pinned to the mat',
+    situation: 'legs'
+});
+CREATE (n:Frame {
+    id: 24,
+    me: '2 legs controlling both legs in double closure',
+    he: 'hips and legs pinned',
+    situation: 'legs'
+});
+
+// Edges
+MATCH (a:Frame),(b:Frame) WHERE a.id = 1 AND b.id = 2 CREATE (a)-[r:TRANSITION {id: 1}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 1 AND b.id = 3 CREATE (a)-[r:TRANSITION {id: 3}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 1 AND b.id = 4 CREATE (a)-[r:TRANSITION {id: 2}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 3 AND b.id = 10 CREATE (a)-[r:TRANSITION {id: 4}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 4 AND b.id = 10 CREATE (a)-[r:TRANSITION {id: 5}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 2 AND b.id = 4 CREATE (a)-[r:TRANSITION {id: 6}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 2 AND b.id = 20 CREATE (a)-[r:TRANSITION {id: 7}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 10 AND b.id = 25 CREATE (a)-[r:TRANSITION {id: 8}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 10 AND b.id = 12 CREATE (a)-[r:TRANSITION {id: 9}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 12 AND b.id = 22 CREATE (a)-[r:TRANSITION {id: 10}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 25 AND b.id = 22 CREATE (a)-[r:TRANSITION {id: 11}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 20 AND b.id = 21 CREATE (a)-[r:TRANSITION {id: 12}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 21 AND b.id = 18 CREATE (a)-[r:TRANSITION {id: 13}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 18 AND b.id = 22 CREATE (a)-[r:TRANSITION {id: 14}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 18 AND b.id = 19 CREATE (a)-[r:TRANSITION {id: 15}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 7 AND b.id = 16 CREATE (a)-[r:TRANSITION {id: 16}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 6 AND b.id = 16 CREATE (a)-[r:TRANSITION {id: 17}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 14 AND b.id = 16 CREATE (a)-[r:TRANSITION {id: 18}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 16 AND b.id = 8 CREATE (a)-[r:TRANSITION {id: 19}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 16 AND b.id = 13 CREATE (a)-[r:TRANSITION {id: 20}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 8 AND b.id = 13 CREATE (a)-[r:TRANSITION {id: 21}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 8 AND b.id = 11 CREATE (a)-[r:TRANSITION {id: 22}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 8 AND b.id = 9 CREATE (a)-[r:TRANSITION {id: 23}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 8 AND b.id = 20 CREATE (a)-[r:TRANSITION {id: 24}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 9 AND b.id = 17 CREATE (a)-[r:TRANSITION {id: 25}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 17 AND b.id = 21 CREATE (a)-[r:TRANSITION {id: 26}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 26 AND b.id = 17 CREATE (a)-[r:TRANSITION {id: 27}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 26 AND b.id = 9 CREATE (a)-[r:TRANSITION {id: 28}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 26 AND b.id = 8 CREATE (a)-[r:TRANSITION {id: 29}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 15 AND b.id = 5 CREATE (a)-[r:TRANSITION {id: 30}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 5 AND b.id = 10 CREATE (a)-[r:TRANSITION {id: 31}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 5 AND b.id = 13 CREATE (a)-[r:TRANSITION {id: 32}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 13 AND b.id = 11 CREATE (a)-[r:TRANSITION {id: 33}]->(b);
+MATCH (a:Frame),(b:Frame) WHERE a.id = 11 AND b.id = 10 CREATE (a)-[r:TRANSITION {id: 34}]->(b);
+

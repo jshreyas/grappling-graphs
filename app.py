@@ -9,8 +9,8 @@ app = Flask(__name__)
 @app.route('/index')
 def index():
     db = Memgraph()
-    db_operations.clear(db)
-    db_operations.populate_database(db, "resources/data_small.txt")
+    # db_operations.clear(db)
+    # db_operations.populate_database(db, "resources/data_small.txt")
     return render_template('index.html')
 
 @app.route('/query')
@@ -43,4 +43,32 @@ def get_relationships():
     db = Memgraph()
     response = make_response(
         jsonify(db_operations.get_relationships(db)), 200)
+    return response
+
+@app.route('/get-frame/<string:frame_id>', methods=["GET"])
+def get_frame(frame_id):
+    db = Memgraph()
+    response = make_response(
+        jsonify(db_operations.get_frame(db, frame_id)), 200)
+    return response
+
+@app.route('/get-frames', methods=["POST"])
+def get_frames():
+    db = Memgraph()
+    response = make_response(
+        jsonify(db_operations.get_frames(db)), 200)
+    return response
+
+@app.route('/get-transitions', methods=["POST"])
+def get_transitions():
+    db = Memgraph()
+    response = make_response(
+        jsonify(db_operations.get_transitions(db)), 200)
+    return response
+
+@app.route("/get-ggraph", methods=["POST"])
+def get_ggraph():
+    db = Memgraph()
+    response = make_response(
+        jsonify(db_operations.get_ggraph(db)), 200)
     return response

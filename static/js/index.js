@@ -1,5 +1,5 @@
 (async() => {
-    let response = await fetch(`${window.origin}/get-graph`, {
+    let response = await fetch(`${window.origin}/get-ggraph`, {
         method: "POST",
         credentials: "include",
         body: JSON.stringify("Get data"),
@@ -19,7 +19,7 @@
         .force("center", d3.forceCenter(width / 2, height / 2));
 
     let responseJSON = await response.json();
-
+    console.log(responseJSON)
     var g = svg.append("g")
         .attr("class", "everything");
 
@@ -44,21 +44,23 @@
 
     node.on('click', function(node) {
         console.log(node)
-        let response = fetch(`${window.origin}/get-user/` + node.id, {
-            method: "GET",
-            credentials: "include",
-            cache: "no-cache",
-            headers: new Headers({
-                "content-type": "application/json"
-            })
-        });
+        // fetch(`${window.origin}/get-frame/` + node.id, {
+        //     method: "GET",
+        //     credentials: "include",
+        //     cache: "no-cache",
+        //     headers: new Headers({
+        //         "content-type": "application/json"
+        //     })
+        // }).then(response => response.json()).then(data => console.log(data));
+        // console.log(response)
     });
 
-    node.append('index')
-        .text(function(d) { return d.index; });
+    link.on('click', function(link) {
+        console.log(link)
+    });
 
     node.append("title")
-        .text(function(d) { return `Id: ${d.id}, Name: ${d.name}`; });
+        .text(function(d) { return `Id: ${d.id}, Situation: ${d.situation}`; });
 
     link.append("title")
         .text(function(d) { return `Source: ${d.source}, Target: ${d.target}`; });
