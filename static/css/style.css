@@ -2,13 +2,21 @@ body {
     background-color: lightgrey;
 }
 
-.links line {
-    stroke: #aaa;
+.links {
+    stroke: #1eaa6e;
 }
 
-.nodes circle {
+.line {
+    stroke: #e90a0a;
+}
+
+.nodes {
+    stroke: #831abc;
+}
+
+.circle {
     pointer-events: all;
-    stroke: none;
+    stroke: #110a0d;
     stroke-width: 40px;
 }
 

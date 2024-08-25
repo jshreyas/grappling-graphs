@@ -1,6 +1,6 @@
 (async() => {
-    let response = await fetch(`${window.origin}/get-graph`, {
-        method: "POST",
+    let response = await fetch(`${window.origin}/get-ggraph`, {
+        method: "GET",
         credentials: "include",
         body: JSON.stringify("Get data"),
         cache: "no-cache",
@@ -18,9 +18,8 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    let responseString = await response.json();
-    let responseJSON = JSON.parse(responseString);
-
+    let responseJSON = await response.json();
+    console.log(responseJSON)
     var g = svg.append("g")
         .attr("class", "everything");
 
@@ -30,20 +29,45 @@
         .data(responseJSON.links)
         .enter().append("line");
 
+    var defaultRadius = 5;
     var node = g.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
         .data(responseJSON.nodes)
         .enter().append("circle")
-        .attr("r", 5.0)
-        .attr("fill", "darkgray")
+        .attr("r", defaultRadius)
+        .attr("fill", "orange")
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
 
+    node.on('click', function(node) {
+        console.log(node)
+        console.log(this)
+        // fetch(`${window.origin}/get-frame/` + node.id, {
+        //     method: "GET",
+        //     credentials: "include",
+        //     cache: "no-cache",
+        //     headers: new Headers({
+        //         "content-type": "application/json"
+        //     })
+        // }).then(response => response.json()).then(data => console.log(data));
+        // console.log(response)
+    });
+
+    link.on('click', function(link) {
+        console.log(link)
+    });
+
+    node.append("data")
+        .text(function(d) { return JSON.stringify(d); });
+
     node.append("title")
-        .text(function(d) { return d.name; });
+        .text(function(d) { return `Id: ${d.id}, Situation: ${d.situation}`; });
+
+    link.append("title")
+        .text(function(d) { return `Source: ${d.source}, Target: ${d.target}`; });
 
     simulation
         .nodes(responseJSON.nodes)

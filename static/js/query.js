@@ -1,6 +1,6 @@
 function runQuery(path) {
     fetch(`${window.origin}/` + path, {
-            method: "POST",
+            method: "GET",
             credentials: "include",
             body: JSON.stringify($(".form-control").val()),
             cache: "no-cache",
@@ -9,7 +9,7 @@ function runQuery(path) {
             })
         }).then(response => response.json())
         .then(data => {
-            var str = JSON.stringify(JSON.parse(data), undefined, 4);
+            var str = JSON.stringify(data, undefined, 4);
             const list = document.getElementById("JSON")
             if (list.hasChildNodes()) {
                 list.removeChild(list.childNodes[0]);

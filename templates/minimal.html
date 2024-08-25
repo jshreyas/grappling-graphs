@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<script src="https://unpkg.com/gojs@3.0.10/release/go.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<p>
+  This is a minimalist HTML and JavaScript skeleton of the GoJS Sample
+  <a href="https://gojs.net/latest/samples/minimal.html">minimal.html</a>. It was automatically generated from a button on the sample page,
+  and does not contain the full HTML. It is intended as a starting point to adapt for your own usage.
+  For many samples, you may need to inspect the
+  <a href="https://github.com/NorthwoodsSoftware/GoJS/blob/master/samples/minimal.html">full source on Github</a>
+  and copy other files or scripts.
+</p>
+<div id="allSampleContent" class="p-4 w-full">
+          
+            
+            
+
+
+<div id="sample">
+  <!-- The DIV for the Diagram needs an explicit size or else we won't see anything.
+       This also adds a border to help see the edges of the viewport. -->
+  <div id="myDiagramDiv" style="border: solid 1px black; width: 400px; height: 400px"></div>
+  <p>
+    This isn't a truly <i>minimal</i> demonstration of <b>GoJS</b>, because we do specify a custom Node template and turn on undo/redo support, but it's pretty
+    simple. The whole source for the sample is shown below if you click on the link.
+  </p>
+  <p>
+    This sample sets the <a>Diagram.nodeTemplate</a>, with a <a>Node</a> template that data binds both the text string and the shape's fill color. For an
+    overview of building your own templates and model data, see the <a href="../learn/index.html">Getting Started tutorial.</a>
+  </p>
+  <p>
+    Using the mouse and common keyboard commands, you can pan, select, move, copy, delete, undo, and redo. On touch devices, use your finger to act as the
+    mouse, and press and hold your finger stationary to bring up a context menu. The default context menu supports most of the standard commands that are
+    enabled at that time for the selected object.
+  </p>
+  <p>For a more elaborate sample, supporting grouping and tooltips and custom context menus, see the <a href="basic.html">Basic</a> sample.</p>
+</div>
+
+<script id="code">
+  const myDiagram = new go.Diagram('myDiagramDiv', {
+    'undoManager.isEnabled': true // enable undo & redo
+  });
+
+  // define a simple Node template
+
+  // try getting rid of this part--the default node template will just make the node appear as the text
+  myDiagram.nodeTemplate = new go.Node('Auto')
+    .add(
+      // two elements: the Shape will go around the TextBlock
+      new go.Shape('RoundedRectangle', { strokeWidth: 0, fill: 'white' }) // no border; default fill is white
+        .bind('fill', 'color'), // Shape.fill is bound to Node.data.color
+      new go.TextBlock({ margin: 8, font: 'bold 14px sans-serif', stroke: '#333' }).bind('text') // some room around the text, bold font // TextBlock.text is bound to Node.data.text
+    );
+
+  // but use the default Link template, by not setting Diagram.linkTemplate
+
+  // create the model data that will be represented by Nodes and Links
+  myDiagram.model = new go.GraphLinksModel(
+    [
+      { key: 1, text: 'Alpha', color: 'lightblue' },
+      { key: 2, text: 'Beta', color: 'orange' },
+      { key: 3, text: 'Gamma', color: 'lightgreen' },
+      { key: 4, text: 'Delta', color: 'pink' }
+    ],
+    [
+      { from: 1, to: 2 },
+      { from: 1, to: 3 },
+      { from: 2, to: 2 },
+      { from: 3, to: 4 },
+      { from: 4, to: 1 }
+    ]
+  );
+</script>
+
+          
+        </div>
+</body>
+</html>
