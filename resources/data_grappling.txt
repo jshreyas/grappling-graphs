@@ -1,166 +1,36 @@
 // standing
-CREATE (n:Frame { 
-    id: 1, 
-    me: 'standing neutral', 
-    he: 'standing neutral',
-    situation: 'standing'
-});
-CREATE (n:Frame { 
-    id: 2, 
-    me: 'circle around shoulders, double underhooks', 
-    he: 'given up shoulder control',
-    situation: 'standing'
-});
-CREATE (n:Frame {
-    id: 3, 
-    me: 'circle around head and shoulder, front headlock', 
-    he: 'given up head and shoulder control in a snap down',
-    situation: 'standing'
-});
-CREATE (n:Frame { 
-    id: 4, 
-    me: 'circle around hips from side/back', 
-    he: 'given up hip control',
-    situation: 'standing'
-});
+CREATE (n:Frame { id: 1, me: 'standing neutral', he: 'standing neutral',situation: 'standing'});
+CREATE (n:Frame { id: 2, me: 'circle around shoulders, double underhooks', he: 'given up shoulder control', situation: 'standing'});
+CREATE (n:Frame {id: 3, me: 'circle around head and shoulder, front headlock', he: 'given up head and shoulder control in a snap down', situation: 'standing'});
+CREATE (n:Frame { id: 4, me: 'circle around hips from side/back', he: 'given up hip control', situation: 'standing'});
 
 // guarded
-CREATE (n:Frame {
-    id: 5, 
-    me: 'both hands on 1 foot', 
-    he: 'forced belly up guard',
-    situation: 'guarded'
-});
-CREATE (n:Frame { 
-    id: 6,
-    me: 'double knees', 
-    he: 'seated guard with 1 shoulder',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 7, 
-    me: 'double knees', 
-    he: 'seated guard with double underhooks',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 8, 
-    me: 'no underhooks, pinned 1 hip', 
-    he: 'bottom half guard',
-    situation: 'guarded'
-});
-CREATE (n:Frame { 
-    id: 9,
-    me: 'far underhook, pinned 1 hip', 
-    he: 'bottom half guard',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 10, 
-    me: 'circle around hips with 0 frames', 
-    he: 'hips controlled from turtle guard',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 11, 
-    me: 'circle around hips with 1 frames', 
-    he: 'hips pinned to the mat',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 12, 
-    me: 'near side hip with hook and far side shoulder', 
-    he: 'turtle guard',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 13,
-    me: 'circle around hips with 2 frames', 
-    he: 'hips pinned to the mat',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 14,
-    me: 'double knees', 
-    he: 'seated guard with head and shoulder',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 15,
-    me: 'standing in guard', 
-    he: 'seated guard with 2 on single leg',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 16,
-    me: 'double knees', 
-    he: 'seated guard with inside limbs',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 17,
-    me: 'both underhooks, pinned 1 hip',
-    he: 'bottom half guard',
-    situation: 'guarded'
-});
-CREATE (n:Frame {
-    id: 26,
-    me: 'half guard top, pinned 1 leg',
-    he: 'bottom half guard with knee shield',
-    situation: 'legs'
-});
+CREATE (n:Frame {id: 5, me: 'both hands on 1 foot', he: 'forced belly up guard', situation: 'guarded'});
+CREATE (n:Frame { id: 6, me: 'double knees', he: 'seated guard with 1 shoulder', situation: 'guarded'});
+CREATE (n:Frame {id: 7, me: 'double knees', he: 'seated guard with double underhooks',situation: 'guarded'});
+CREATE (n:Frame {id: 8, me: 'no underhooks, pinned 1 hip', he: 'bottom half guard',situation: 'guarded'});
+CREATE (n:Frame { id: 9,me: 'far underhook, pinned 1 hip', he: 'bottom half guard', situation: 'guarded'});
+CREATE (n:Frame {id: 10, me: 'circle around hips with 0 frames', he: 'hips controlled from turtle guard',situation: 'guarded'});
+CREATE (n:Frame {id: 11, me: 'circle around hips with 1 frames', he: 'hips pinned to the mat',situation: 'guarded'});
+CREATE (n:Frame {id: 12, me: 'near side hip with hook and far side shoulder', he: 'turtle guard',situation: 'guarded'});
+CREATE (n:Frame {id: 13,me: 'circle around hips with 2 frames', he: 'hips pinned to the mat',situation: 'guarded'});
+CREATE (n:Frame {id: 14,me: 'double knees', he: 'seated guard with head and shoulder',situation: 'guarded'});
+CREATE (n:Frame {id: 15,me: 'standing in guard', he: 'seated guard with 2 on single leg',situation: 'guarded'});
+CREATE (n:Frame {id: 16,me: 'double knees', he: 'seated guard with inside limbs',situation: 'guarded'});
+CREATE (n:Frame {id: 17,me: 'both underhooks, pinned 1 hip',he: 'bottom half guard',situation: 'guarded'});
+CREATE (n:Frame {id: 26,me: 'half guard top, pinned 1 leg',he: 'bottom half guard with knee shield',situation: 'legs'});
 
 // pinning
-CREATE (n:Frame {
-    id: 18,
-    me: 's mount', 
-    he: 'bottom pin',
-    situation: 'pinning'
-});
-CREATE (n:Frame {
-    id: 19,
-    me: 'spider web', 
-    he: 'connected arms bottom pin',
-    situation: 'pinning'
-});
-CREATE (n:Frame {
-    id: 20,
-    me: 'mount: hips covered with legs',
-    he: 'mount bottom',
-    situation: 'pinning'
-});
-CREATE (n:Frame {
-    id: 21,
-    me: 'both underhooks', 
-    he: 'mount bottom',
-    situation: 'pinning'
-});
-CREATE (n:Frame {
-    id: 22,
-    me: 'back: seatbelt control of shoulders and both hooks to control hips',
-    he: 'given up back',
-    situation: 'pinning'
-});
-CREATE (n:Frame {
-    id: 25,
-    me: 'back: seatbelt control of shoulders and no hooks',
-    he: 'given up back shoulders',
-    situation: 'pinning'
-});
+CREATE (n:Frame {id: 18, me: 's mount', he: 'bottom pin', situation: 'pinning'});
+CREATE (n:Frame {id: 19, me: 'spider web', he: 'connected arms bottom pin', situation: 'pinning' });
+CREATE (n:Frame {id: 20,me: 'mount: hips covered with legs',he: 'mount bottom',situation: 'pinning'});
+CREATE (n:Frame {id: 21,me: 'both underhooks', he: 'mount bottom',situation: 'pinning'});
+CREATE (n:Frame {id: 22,me: 'back: seatbelt control of shoulders and both hooks to control hips',he: 'given up back',situation: 'pinning'});
+CREATE (n:Frame {id: 25,me: 'back: seatbelt control of shoulders and no hooks',he: 'given up back shoulders',situation: 'pinning'});
 
 // legs
-CREATE (n:Frame {
-    id: 23,
-    me: '2 legs controlling hips', 
-    he: 'hips pinned to the mat',
-    situation: 'legs'
-});
-CREATE (n:Frame {
-    id: 24,
-    me: '2 legs controlling both legs in double closure',
-    he: 'hips and legs pinned',
-    situation: 'legs'
-});
+CREATE (n:Frame {id: 23, me: '2 legs controlling hips', he: 'hips pinned to the mat',situation: 'legs'});
+CREATE (n:Frame {id: 24,me: '2 legs controlling both legs in double closure',he: 'hips and legs pinned',situation: 'legs'});
 
 // Edges
 MATCH (a:Frame),(b:Frame) WHERE a.id = 1 AND b.id = 2 CREATE (a)-[r:TRANSITION {id: 1}]->(b);

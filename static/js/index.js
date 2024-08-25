@@ -1,6 +1,6 @@
 (async() => {
     let response = await fetch(`${window.origin}/get-ggraph`, {
-        method: "POST",
+        method: "GET",
         credentials: "include",
         body: JSON.stringify("Get data"),
         cache: "no-cache",
@@ -44,6 +44,7 @@
 
     node.on('click', function(node) {
         console.log(node)
+        console.log(this)
         // fetch(`${window.origin}/get-frame/` + node.id, {
         //     method: "GET",
         //     credentials: "include",
@@ -58,6 +59,9 @@
     link.on('click', function(link) {
         console.log(link)
     });
+
+    node.append("data")
+        .text(function(d) { return JSON.stringify(d); });
 
     node.append("title")
         .text(function(d) { return `Id: ${d.id}, Situation: ${d.situation}`; });

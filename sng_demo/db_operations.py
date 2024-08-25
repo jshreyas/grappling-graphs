@@ -14,6 +14,7 @@ def populate_database(db, path):
     lines = file.readlines()
     file.close()
     for line in lines:
+        print(line)
         if len(line.strip()) != 0 and line[0] != '/':
             db.execute_query(line)
 
@@ -23,10 +24,16 @@ def get_transitions(db):
 
     transition_objects = []
     for transition in transitions:
-        data = transition['e'].properties
-        data["target"] = transition['n2'].properties["id"]
-        data["source"] = transition['n1'].properties["id"]
-        transition_objects.append(data)
+        # data = transition['e'].properties
+        # data["target"] = transition['n2'].properties["id"]
+        # data["source"] = transition['n1'].properties["id"]
+        # transition_objects.append(data)
+        pender = {
+            "to": transition['n2'].properties["id"],
+            "from": transition['n1'].properties["id"],
+            "text": transition['e'].properties["id"]
+        }
+        transition_objects.append(pender)
     return transition_objects
 
 def get_frame(db, id) -> Node:
@@ -41,7 +48,14 @@ def get_frames(db) -> List[Node]:
 
     frame_objects = []
     for frame in frames:
-        frame_objects.append(frame['n'].properties)
+        # pender = frame['n'].properties
+        pender = {
+            "key": frame['n'].properties["id"],
+            "text": frame['n'].properties["me"],
+            "situation": frame['n'].properties["situation"],
+            "he": frame['n'].properties["he"],
+        }
+        frame_objects.append(pender)
     return frame_objects
 
 def get_ggraph(db):

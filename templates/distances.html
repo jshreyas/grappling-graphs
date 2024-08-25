@@ -1,0 +1,639 @@
+{% extends 'base.html' %} {% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<script src="https://unpkg.com/gojs@3.0.10/release/go.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://unpkg.com/create-gojs-kit@3.0.10/dist/extensions/DataInspector.js"></script>
+<p>
+  nogi grappling transitions frame by frame
+</p>
+<div id="allSampleContent" class="p-4 w-full">
+          
+<style>
+    /* Default CSS for the Data inspector */
+    .inspector {
+        display: inline-block;
+        font: bold 14px helvetica, sans-serif;
+        background-color: #212121;
+    
+        /* Grey 100 */
+        cursor: default;
+    }
+    
+    .inspector table {
+        border-collapse: separate;
+        border-spacing: 2px;
+    }
+    
+    .inspector td,
+    th {
+        /* Grey 900 */
+        color: #f5f5f5;
+        padding: 2px;
+    }
+    
+    .inspector input {
+        background-color: #424242;
+        /* Grey 800 */
+        color: #f5f5f5;
+        /* Grey 100 */
+        font: bold 12px helvetica, sans-serif;
+        border: 0px;
+        padding: 2px;
+    }
+    
+    .inspector input:disabled {
+        background-color: #bdbdbd;
+        /* Grey 400 */
+        color: #616161;
+        /* Grey 700 */
+    }
+    
+    .inspector select {
+        background-color: #424242;
+    }
+</style>     
+            
+
+<script id="code">
+  function init() {
+    myDiagram = new go.Diagram('myDiagramDiv', {
+      initialAutoScale: go.AutoScale.Uniform,
+      contentAlignment: go.Spot.Center,
+        // layout: new go.ForceDirectedLayout(),
+        layout: new go.ForceDirectedLayout({ // automatically spread nodes apart
+            defaultElectricalCharge: 300,
+            defaultSpringLength: 150
+      }),
+      maxSelectionCount: 2
+    });
+
+////
+    // myDiagram.nodeTemplate = new go.Node('Auto', { // the whole node panel
+    //   locationSpot: go.Spot.Center
+    // })
+    //   .add(
+    //     // define the node's outer shape, which will surround the TextBlock
+    //     new go.Shape('Rectangle', {
+    //       fill: new go.Brush('Linear', { 0: 'rgb(254, 201, 0)', 1: 'rgb(254, 162, 0)' }),
+    //       stroke: 'black'
+    //     }),
+    //     new go.TextBlock({ font: 'bold 10pt helvetica, bold arial, sans-serif', margin: 4 })
+    //       .bind('text')
+    //   );
+////
+
+    // define the Node template
+    myDiagram.nodeTemplate = new go.Node('Auto', {
+        locationSpot: go.Spot.Center, // Node.location is the center of the Shape
+        locationObjectName: 'SHAPE',
+        selectionAdorned: false,
+        selectionChanged: nodeSelectionChanged // defined below
+      }
+    )
+      .add(
+        new go.Panel('Spot')
+          .add(
+            new go.Shape('Rectangle', {
+              name: 'SHAPE',
+              stroke: 'black',
+            //   fill: 'lightgray', // default value, but also data-bound
+              fill: new go.Brush('Linear', { 0: 'rgb(254, 201, 0)', 1: 'rgb(254, 162, 0)' }),
+            //   strokeWidth: 0,
+              desiredSize: new go.Size(30, 30),
+              portId: '' // so links will go to the shape, not the whole node
+            }).bindObject('fill', 'isSelected', (s, obj) => (s ? 'blue' : obj.part.data.color)),
+            // new go.TextBlock().bind('text', 'distance', (d) => (d === Infinity ? 'INF' : d | 0))
+          ),
+        new go.TextBlock().bind('text')
+      );
+
+    // define the Link template
+    myDiagram.linkTemplate = new go.Link({
+      selectable: false, // links cannot be selected by the user
+      curve: go.Curve.Bezier,
+      layerName: 'Background' // don't cross in front of any nodes
+    })
+      .add(
+        new go.Shape({ // this shape only shows when it isHighlighted
+          isPanelMain: true,
+          stroke: null,
+          strokeWidth: 5
+        }).bindObject('stroke', 'isHighlighted', (h) => (h ? 'blue' : null)),
+        new go.Shape({ // mark each Shape to get the link geometry with isPanelMain: true
+          isPanelMain: true,
+          stroke: 'black',
+          strokeWidth: 1
+        }).bind('stroke', 'color'),
+        new go.Shape({ toArrow: 'Standard' }),
+        new go.TextBlock({ // the label text
+              textAlign: 'center',
+              font: '10pt helvetica, arial, sans-serif',
+              stroke: '#555555',
+              margin: 4
+            }).bind('text')
+      );
+
+    // Override the clickSelectingTool's standardMouseSelect
+    // If less than 2 nodes are selected, always add to the selection
+    myDiagram.toolManager.clickSelectingTool.standardMouseSelect = function () {
+      // method override must be function, not =>
+      const diagram = this.diagram;
+      if (diagram === null || !diagram.allowSelect) return;
+      var e = diagram.lastInput;
+      var count = diagram.selection.count;
+      var curobj = diagram.findPartAt(e.documentPoint, false);
+      if (curobj !== null) {
+        if (count < 2) {
+          // add the part to the selection
+          if (!curobj.isSelected) {
+            var part = curobj;
+            if (part !== null) part.isSelected = true;
+          }
+        } else {
+          if (!curobj.isSelected) {
+            var part = curobj;
+            if (part !== null) diagram.select(part);
+          }
+        }
+      } else if (e.left && !(e.control || e.meta) && !e.shift) {
+        // left click on background with no modifier: clear selection
+        diagram.clearSelection();
+      }
+    };
+
+    myDiagram.select(myDiagram.nodes.first());
+    var inspector = new Inspector('myInspectorDiv', myDiagram, {
+        properties: {
+            text: {},
+            // key would be automatically added for nodes, but we want to declare it read-only also:
+            key: { readOnly: true, show: Inspector.showIfPresent },
+            // color would be automatically added for nodes, but we want to declare it a color also:
+            color: { show: Inspector.showIfPresent, type: 'color' },
+            distance: { readOnly: true, show: Inspector.showIfPresent },
+        }
+    });
+
+    generateGraph();
+
+    // chooseTwoNodes();
+  }
+
+  // Create an assign a model that has a bunch of nodes with a bunch of random links between them.
+  function generateGraph() {
+    // var nodes = [
+
+        // { key: 23, text: '2 legs controlling hips', situation: 'legs', he: 'hips pinned to the mat'},
+        // { key: 24, text: '2 legs controlling both legs in double closure', situation: 'legs', he: 'hips and legs pinned'},
+        // { key: 18, text: 's mount', situation: 'pinning', he: 'bottom pin'},
+        // { key: 19, text: 'spider web', situation: 'pinning', he: 'connected arms bottom pin'},
+        // { key: 20, text: 'mount: hips covered with legs', situation: 'pinning', he: 'mount bottom'},
+        // { key: 21, text: 'both underhooks', situation: 'pinning', he: 'mount bottom'},
+        // { key: 22, text: 'back: seatbelt control of shoulders and both hooks to control hips', situation: 'pinning', he: 'given up back'},
+        // { key: 25, text: 'back: seatbelt control of shoulders and no hooks', situation: 'pinning', he: 'given up back shoulders'},
+        // { key: 1, text: 'standing neutral', situation: 'standing', he: 'standing neutral'},
+        // { key: 2, text: 'circle around shoulders, double underhooks', situation: 'standing', he: 'given up shoulder control'},
+        // { key: 3, text: 'circle around head and shoulder, front headlock', situation: 'standing', he: 'given up head and shoulder control in a snap down'},
+        // { key: 4, text: 'circle around hips from side/back', situation: 'standing', he: 'given up hip control'},
+
+        // { key: 5, text: 'standing neutral', situation: 'standing', he: 'standing neutral'},
+        // { key: 6, text: 'circle around shoulders, double underhooks', situation: 'standing', he: 'given up shoulder control'},
+        // { key: 7, text: 'circle around head and shoulder, front headlock', situation: 'standing', he: 'given up head and shoulder control in a snap down'},
+        // { key: 8, text: 'circle around hips from side/back', situation: 'standing', he: 'given up hip control'},
+        // { key: 9, text: 'standing neutral', situation: 'standing', he: 'standing neutral'},
+        // { key: 10, text: 'circle around shoulders, double underhooks', situation: 'standing', he: 'given up shoulder control'},
+        // { key: 11, text: 'circle around head and shoulder, front headlock', situation: 'standing', he: 'given up head and shoulder control in a snap down'},
+        // { key: 12, text: 'circle around hips from side/back', situation: 'standing', he: 'given up hip control'},
+        // { key: 13, text: 'standing neutral', situation: 'standing', he: 'standing neutral'},
+        // { key: 14, text: 'circle around shoulders, double underhooks', situation: 'standing', he: 'given up shoulder control'},
+        // { key: 15, text: 'circle around head and shoulder, front headlock', situation: 'standing', he: 'given up head and shoulder control in a snap down'},
+        // { key: 16, text: 'circle around hips from side/back', situation: 'standing', he: 'given up hip control'},
+        // { key: 17, text: 'circle around head and shoulder, front headlock', situation: 'standing', he: 'given up head and shoulder control in a snap down'},
+        // { key: 26, text: 'circle around hips from side/back', situation: 'standing', he: 'given up hip control'},
+
+
+
+//         CREATE (n:Frame {
+//     id: 5, 
+//     me: 'both hands on 1 foot', 
+//     he: 'forced belly up guard',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame { 
+//     id: 6,
+//     me: 'double knees', 
+//     he: 'seated guard with 1 shoulder',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 7, 
+//     me: 'double knees', 
+//     he: 'seated guard with double underhooks',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 8, 
+//     me: 'no underhooks, pinned 1 hip', 
+//     he: 'bottom half guard',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame { 
+//     id: 9,
+//     me: 'far underhook, pinned 1 hip', 
+//     he: 'bottom half guard',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 10, 
+//     me: 'circle around hips with 0 frames', 
+//     he: 'hips controlled from turtle guard',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 11, 
+//     me: 'circle around hips with 1 frames', 
+//     he: 'hips pinned to the mat',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 12, 
+//     me: 'near side hip with hook and far side shoulder', 
+//     he: 'turtle guard',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 13,
+//     me: 'circle around hips with 2 frames', 
+//     he: 'hips pinned to the mat',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 14,
+//     me: 'double knees', 
+//     he: 'seated guard with head and shoulder',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 15,
+//     me: 'standing in guard', 
+//     he: 'seated guard with 2 on single leg',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 16,
+//     me: 'double knees', 
+//     he: 'seated guard with inside limbs',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 17,
+//     me: 'both underhooks, pinned 1 hip',
+//     he: 'bottom half guard',
+//     situation: 'guarded'
+// });
+// CREATE (n:Frame {
+//     id: 26,
+//     me: 'half guard top, pinned 1 leg',
+//     he: 'bottom half guard with knee shield',
+//     situation: 'legs'
+// });
+
+
+    // ];
+    var links = [
+        { from: 1, to: 5, text: 'represent' },
+        { from: 5, to: 2, text: 'is' },
+        { from: 5, to: 3, text: 'when' },
+        { from: 1, to: 3, text: 'hence' },
+        { from: 1, to: 4, text: 'aids' },
+        { from: 4, to: 1, text: 'is' },
+        { from: 3, to: 2, text: 'has a' },
+        { from: 4, to: 3, text: 'is a' },
+        { from: 3, to: 6, text: 'display' },
+        { from: 5, to: 4, text: 'nice' }
+    ]
+
+    // var nodeDataArray = [];
+    // for (var i = 0; i < nodes.length; i++) {
+    //   nodeDataArray.push({ key: i, text: nodes[i], color: go.Brush.randomColor(128, 240) });
+    // }
+
+    // var linkDataArray = [];
+    // for (var i = 0; i < links.length; i++) {
+    //   linkDataArray.push({ from: links[i][0], to: links[i][1],  text: 'is', color: go.Brush.randomColor(0, 127) });
+    // }
+
+    fetch(`${window.origin}/get-ggraph`, {
+        method: "GET",
+        credentials: "include",
+        cache: "no-cache",
+        headers: new Headers({
+            "content-type": "application/json"
+        })
+    }).then(response => response.json()).then(ggr => {
+        console.log(ggr);
+        let frames = ggr["nodes"]
+        for (var i = 0; i < ggr["nodes"].length; i++) {
+            frames[i]["color"] =  new go.Brush('Linear', { 0: 'rgb(254, 201, 0)', 1: 'rgb(254, 162, 0)' })
+        }
+        myDiagram.model = new go.GraphLinksModel(frames, ggr["links"]);
+    });
+        
+        // console.log(ggr));
+
+        // myDiagram.model = new go.GraphLinksModel(ggr["nodes"], ggr["links"]));
+
+
+    // myDiagram.model = new go.GraphLinksModel(nnode, links);
+  }
+
+  // Select two nodes at random for which there is a path that connects from the first one to the second one.
+  function chooseTwoNodes() {
+    myDiagram.clearSelection();
+    var num = myDiagram.model.nodeDataArray.length;
+    var node1 = null;
+    var node2 = null;
+    console.log("start")
+    for (var i = Math.floor(Math.random() * num); i < num * 2; i++) {
+      node1 = myDiagram.findNodeForKey(i % num);
+      var distances = findDistances(node1);
+      for (var j = Math.floor(Math.random() * num); j < num * 2; j++) {
+        node2 = myDiagram.findNodeForKey(j % num);
+        var dist = distances.get(node2);
+        if (dist > 1 && dist < Infinity) {
+          node1.isSelected = true;
+          node2.isSelected = true;
+          console.log("YYY")
+          break;
+        }
+      }
+      if (myDiagram.selection.count > 0) {
+        console.log("yay")
+        break;
+      }      
+    }
+    console.log("end")
+  }
+
+  // This event handler is declared in the node template and is called when a node's
+  //   Node.isSelected property changes value.
+  // When a node is selected show distances from the first selected node.
+  // When a second node is selected, highlight the shortest path between two selected nodes.
+  // If a node is deselected, clear all highlights.
+  function nodeSelectionChanged(node) {
+    var diagram = node.diagram;
+    if (diagram === null) return;
+    diagram.clearHighlighteds();
+    if (node.isSelected) {
+      // when there is a selection made, always clear out the list of all paths
+      var sel = document.getElementById('myPaths');
+      sel.innerHTML = '';
+
+      // show the distance for each node from the selected node
+      var begin = diagram.selection.first();
+      showDistances(begin);
+
+      if (diagram.selection.count === 2) {
+        var end = node; // just became selected
+
+        // highlight the shortest path
+        highlightShortestPath(begin, end);
+
+        // list all paths
+        listAllPaths(begin, end);
+      }
+    }
+  }
+
+  // Have each node show how far it is from the BEGIN node.
+  // This sets the "distance" property on each node.data.
+  function showDistances(begin) {
+    // compute and remember the distance of each node from the BEGIN node
+    distances = findDistances(begin);
+
+    // show the distance on each node
+    var it = distances.iterator;
+    while (it.next()) {
+      var n = it.key;
+      var dist = it.value;
+      myDiagram.model.setDataProperty(n.data, 'distance', dist);
+    }
+  }
+
+  // Highlight links along one of the shortest paths between the BEGIN and the END nodes.
+  // Assume links are directional.
+  function highlightShortestPath(begin, end) {
+    highlightPath(findShortestPath(begin, end));
+  }
+
+  // A collection of all of the paths between a pair of nodes, a List of Lists of Nodes
+  var paths = null;
+
+  // List all paths from BEGIN to END
+  function listAllPaths(begin, end) {
+    // compute and remember all paths from BEGIN to END: Lists of Nodes
+    paths = collectAllPaths(begin, end);
+
+    // update the Selection element with a bunch of Option elements, one per path
+    var sel = document.getElementById('myPaths');
+    sel.innerHTML = ''; // clear out any old Option elements
+    paths.each((p) => {
+      var opt = document.createElement('option');
+      opt.text = pathToString(p);
+      sel.add(opt, null);
+    });
+    sel.onchange = highlightSelectedPath;
+  }
+
+  // Return a string representation of a path for humans to read.
+  function pathToString(path) {
+    var s = path.length + ': ';
+    for (var i = 0; i < path.length; i++) {
+      if (i > 0) s += ' -- ';
+      s += path.get(i).data.text;
+    }
+    return s;
+  }
+
+  // This is only used for listing all paths for the selection onchange event.
+
+  // When the selected item changes in the Selection element,
+  // highlight the corresponding path of nodes.
+  function highlightSelectedPath() {
+    var sel = document.getElementById('myPaths');
+    highlightPath(paths.get(sel.selectedIndex));
+  }
+
+  // Highlight a particular path, a List of Nodes.
+  function highlightPath(path) {
+    myDiagram.clearHighlighteds();
+    for (var i = 0; i < path.count - 1; i++) {
+      var f = path.get(i);
+      var t = path.get(i + 1);
+      f.findLinksTo(t).each((l) => (l.isHighlighted = true));
+    }
+  }
+
+  // There are three bits of functionality here:
+  // 1: findDistances(Node) computes the distance of each Node from the given Node.
+  //    This function is used by showDistances to update the model data.
+  // 2: findShortestPath(Node, Node) finds a shortest path from one Node to another.
+  //    This uses findDistances.  This is used by highlightShortestPath.
+  // 3: collectAllPaths(Node, Node) produces a collection of all paths from one Node to another.
+  //    This is used by listAllPaths.  The result is remembered in a global variable
+  //    which is used by highlightSelectedPath.  This does not depend on findDistances.
+
+  // Returns a Map of Nodes with distance values from the given source Node.
+  // Assumes all links are directional.
+  function findDistances(source) {
+    var diagram = source.diagram;
+    // keep track of distances from the source node
+    var distances = new go.Map(/*go.Node, "number"*/);
+    // all nodes start with distance Infinity
+    var nit = diagram.nodes;
+    while (nit.next()) {
+      var n = nit.value;
+      distances.set(n, Infinity);
+    }
+    // the source node starts with distance 0
+    distances.set(source, 0);
+    // keep track of nodes for which we have set a non-Infinity distance,
+    // but which we have not yet finished examining
+    var seen = new go.Set(/*go.Node*/);
+    seen.add(source);
+
+    // keep track of nodes we have finished examining;
+    // this avoids unnecessary traversals and helps keep the SEEN collection small
+    var finished = new go.Set(/*go.Node*/);
+    while (seen.count > 0) {
+      // look at the unfinished node with the shortest distance so far
+      var least = leastNode(seen, distances);
+      var leastdist = distances.get(least);
+      // by the end of this loop we will have finished examining this LEAST node
+      seen.delete(least);
+      finished.add(least);
+      // look at all Links connected with this node
+      var it = least.findLinksOutOf();
+      while (it.next()) {
+        var link = it.value;
+        var neighbor = link.getOtherNode(least);
+        // skip nodes that we have finished
+        if (finished.has(neighbor)) continue;
+        var neighbordist = distances.get(neighbor);
+        // assume "distance" along a link is unitary, but could be any non-negative number.
+        var dist = leastdist + 1; //Math.sqrt(least.location.distanceSquaredPoint(neighbor.location));
+        if (dist < neighbordist) {
+          // if haven't seen that node before, add it to the SEEN collection
+          if (neighbordist === Infinity) {
+            seen.add(neighbor);
+          }
+          // record the new best distance so far to that node
+          distances.set(neighbor, dist);
+        }
+      }
+    }
+
+    return distances;
+  }
+
+  // This helper function finds a Node in the given collection that has the smallest distance.
+  function leastNode(coll, distances) {
+    var bestdist = Infinity;
+    var bestnode = null;
+    var it = coll.iterator;
+    while (it.next()) {
+      var n = it.value;
+      var dist = distances.get(n);
+      if (dist < bestdist) {
+        bestdist = dist;
+        bestnode = n;
+      }
+    }
+    return bestnode;
+  }
+
+  // Find a path that is shortest from the BEGIN node to the END node.
+  // (There might be more than one, and there might be none.)
+  function findShortestPath(begin, end) {
+    // compute and remember the distance of each node from the BEGIN node
+    distances = findDistances(begin);
+
+    // now find a path from END to BEGIN, always choosing the adjacent Node with the lowest distance
+    var path = new go.List();
+    path.add(end);
+    while (end !== null) {
+      var next = leastNode(end.findNodesInto(), distances);
+      if (next !== null) {
+        if (distances.get(next) < distances.get(end)) {
+          path.add(next); // making progress towards the beginning
+        } else {
+          next = null; // nothing better found -- stop looking
+        }
+      }
+      end = next;
+    }
+    // reverse the list to start at the node closest to BEGIN that is on the path to END
+    // NOTE: if there's no path from BEGIN to END, the first node won't be BEGIN!
+    path.reverse();
+    return path;
+  }
+
+  // Recursively walk the graph starting from the BEGIN node;
+  // when reaching the END node remember the list of nodes along the current path.
+  // Finally return the collection of paths, which may be empty.
+  // This assumes all links are directional.
+  function collectAllPaths(begin, end) {
+    var stack = new go.List(/*go.Node*/);
+    var coll = new go.List(/*go.List*/);
+
+    function find(source, end) {
+      source.findNodesOutOf().each((n) => {
+        if (n === source) return; // ignore reflexive links
+        if (n === end) {
+          // success
+          var path = stack.copy();
+          path.add(end); // finish the path at the end node
+          coll.add(path); // remember the whole path
+        } else if (!stack.has(n)) {
+          // inefficient way to check having visited
+          stack.add(n); // remember that we've been here for this path (but not forever)
+          find(n, end);
+          stack.removeAt(stack.count - 1);
+        } // else might be a cycle
+      });
+    }
+
+    stack.add(begin); // start the path at the begin node
+    find(begin, end);
+    return coll;
+  }
+
+
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+
+<div id="sample">
+    <div style="margin-left: 10px">
+      <div id="myDiagramDiv" style="border: solid 1px black; width: 90%; height: 700px"></div>
+    </div>
+  <span style="display: inline-block; vertical-align: top">
+    Selected Part:<br>
+    <div id="myInspectorDiv" class="inspector"></div>
+    <br>
+  </span>
+</div>
+  <div>
+  <!-- <p>
+    <button onclick="chooseTwoNodes()">Choose another two nodes at random</button>
+  </p> -->
+  <p>Here is a list of all paths between the first and second selected nodes. Select a path to highlight it in the diagram.</p>
+  <select id="myPaths" style="min-width: 100px" size="10"></select>
+</div>
+
+          
+        </div>
+</body>
+</html>
+{% endblock %}

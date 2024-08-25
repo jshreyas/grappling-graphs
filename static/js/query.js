@@ -1,6 +1,6 @@
 function runQuery(path) {
     fetch(`${window.origin}/` + path, {
-            method: "POST",
+            method: "GET",
             credentials: "include",
             body: JSON.stringify($(".form-control").val()),
             cache: "no-cache",
