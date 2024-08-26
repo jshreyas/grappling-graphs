@@ -25,6 +25,10 @@ def reseed():
 def gojs():
     return render_template('gojs.html')
 
+@app.route('/hover')
+def hover():
+    return render_template('hoverButtons.html')
+
 @app.route('/minimal')
 def minimal():
     return render_template('minimal.html')

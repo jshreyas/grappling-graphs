@@ -85,8 +85,37 @@
     //   );
 ////
 
+    // this is shown by the mouseHover event handler
+    var nodeHoverAdornment = new go.Adornment('Spot', {
+      //background: "transparent",
+      // hide the Adornment when the mouse leaves it
+      mouseLeave: (e, obj) => {
+        var ad = obj.part;
+        ad.adornedPart.removeAdornment('mouseHover');
+      }
+    })
+      .add(
+        new go.Placeholder({
+          //background: "transparent",  // to allow this Placeholder to be "seen" by mouse events
+          isActionable: true, // needed because this is in a temporary Layer
+          click: (e, obj) => {
+            var node = obj.part.adornedPart;
+            node.diagram.select(node);
+          }
+        }),
+        // go.GraphObject.build('Button', { alignment: go.Spot.Left, alignmentFocus: go.Spot.Right, click: (e, obj) => alert('Hi!') })
+        //   .add(new go.TextBlock('Hi!')),
+        go.GraphObject.build('Button', { alignment: go.Spot.Right, alignmentFocus: go.Spot.Left, click: (e, obj) => alert('Bye') })
+          .add(new go.TextBlock('Bye'))
+      );
+
     // define the Node template
     myDiagram.nodeTemplate = new go.Node('Auto', {
+        mouseHover: (e, obj) => {
+            var node = obj.part;
+            nodeHoverAdornment.adornedObject = node;
+            node.addAdornment('mouseHover', nodeHoverAdornment);
+        },
         locationSpot: go.Spot.Center, // Node.location is the center of the Shape
         locationObjectName: 'SHAPE',
         selectionAdorned: false,
@@ -104,7 +133,7 @@
             //   strokeWidth: 0,
               desiredSize: new go.Size(30, 30),
               portId: '' // so links will go to the shape, not the whole node
-            }).bindObject('fill', 'isSelected', (s, obj) => (s ? 'blue' : obj.part.data.color)),
+            }).bindObject('fill', 'isSelected', (s, obj) => (s ? 'lightgreen' : obj.part.data.color)),
             // new go.TextBlock().bind('text', 'distance', (d) => (d === Infinity ? 'INF' : d | 0))
           ),
         new go.TextBlock().bind('text')
@@ -121,7 +150,7 @@
           isPanelMain: true,
           stroke: null,
           strokeWidth: 5
-        }).bindObject('stroke', 'isHighlighted', (h) => (h ? 'blue' : null)),
+        }).bindObject('stroke', 'isHighlighted', (h) => (h ? 'pink' : null)),
         new go.Shape({ // mark each Shape to get the link geometry with isPanelMain: true
           isPanelMain: true,
           stroke: 'black',
