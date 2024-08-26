@@ -19,7 +19,7 @@ def populate_database(db, path):
             db.execute_query(line)
 
 def get_transitions(db):
-    command = "MATCH (n1)-[e:TRANSITION]-(n2) RETURN n1,n2,e;"
+    command = "MATCH (n1)-[e:TRANSITION]->(n2) RETURN n1,n2,e;"
     transitions = db.execute_and_fetch(command)
 
     transition_objects = []
@@ -48,7 +48,6 @@ def get_frames(db) -> List[Node]:
 
     frame_objects = []
     for frame in frames:
-        # pender = frame['n'].properties
         pender = {
             "key": frame['n'].properties["id"],
             "text": frame['n'].properties["me"],
