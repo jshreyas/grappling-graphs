@@ -1,4 +1,4 @@
-# Social Network Graph Demo
+# Grappling Graph Demo
 
 
 When you think about a web application, a graph database doesn’t usually spring to mind. Instead, most people just take the familiar route of using an SQL database to store information. While this is perfectly acceptable for most use cases there are sometimes those that would see tremendous benefits by using a graph database.
@@ -21,3 +21,14 @@ docker-compose up
 Once the app is up, head over to the `localhost:5000` to see the demo.
 
 To learn how we built the demo, read  our [blog post](https://memgraph.com/blog/how-to-visualize-a-social-network-in-python-with-a-graph-database).
+
+# Planned Features
+-> Provide users with the pre-requisite glossary (in a digestable form) to harness GG's features to the best/most potential
+-> When the user selects 2 nodes/frames, GG returns the shortest, ideal and economical path between the 2 frames
+-> When a user hovers/clicks on the node and edge, GG provides all the necessary metadata respectively
+-> When a user hovers/clicks on the node, GG provides screenshots of the frame in the node
+-> When a user hovers/clicks on the edge, GG provides video links of the transition in the edge
+-> Educate/evangalize game types, game structure, game components and game development
+-> Promote/acknowledge Rob Gray, Greg Sauders and Dr. Mike
+-> * Display path traversal simulations, AI video editing opportunities
+-> * Pearls of wisdom, embed notion content
